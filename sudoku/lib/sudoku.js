@@ -1,6 +1,4 @@
 'use strict';
-const assert = require('assert');
-const { inspect } = require('util');
 
 // Uniformly generates random integers in the range [lo, hi)
 function uniformRand(lo/*: number*/, hi/*: number*/)/*: number*/ {
@@ -52,6 +50,10 @@ class Board {
     this.squares = squares;
     this.cellsPerSquare = cellsPerSquare;
     this.board = makeBoard(this.squares, this.cellsPerSquare);
+  }
+
+  at(i/*: number*/, j/*: number*/)/*: number*/{
+    return this.board[i][j];
   }
 
   maxNumber()/*: number*/ {
@@ -132,7 +134,7 @@ class Board {
   }
 
   fill()/*: Board*/ {
-    console.time('fill');
+    //console.time('fill');
     const z = this.maxNumber();
     let nextFillNumber = 1;
     let fillAttempt = 0;
@@ -152,7 +154,7 @@ class Board {
         }
       }
     }
-    console.timeEnd('fill');
+    //console.timeEnd('fill');
     return this;
   }
 
@@ -171,7 +173,7 @@ class Board {
     const marked = (new Array(z + 1)).fill(0);
     for (let u = x; u < x + this.cellsPerSquare; u++) {
       for (let v = y; v < y + this.cellsPerSquare; v++) {
-        assert(typeof this.board[u][v] === 'number', `i=${u}, j=${v} => ${typeof this.board[u][v]}`);
+        //console.assert(typeof this.board[u][v] === 'number', `i=${u}, j=${v} => ${typeof this.board[u][v]}`);
         if (typeof this.board[u][v] === 'number' && this.board[u][v] > 0) {
           marked[this.board[u][v]]++;
         }
@@ -190,9 +192,9 @@ class Board {
     const marked = (new Array(z + 1)).fill(0);
     for (let u = 0; u < z; u++) {
       if (typeof this.board[i][u] !== 'number') {
-        console.log(this.board);
+        //console.log(this.board);
       }
-      assert(typeof this.board[i][u] === 'number', `i=${i}, j=${u} => ${typeof this.board[i][u]}`);
+      //console.assert(typeof this.board[i][u] === 'number', `i=${i}, j=${u} => ${typeof this.board[i][u]}`);
       if (typeof this.board[i][u] === 'number' && this.board[i][u] > 0) {
         marked[this.board[i][u]]++;
       }
@@ -209,7 +211,7 @@ class Board {
     const z = this.maxNumber()
     const marked = (new Array(z + 1)).fill(0);
     for (let v = 0; v < z; v++) {
-      assert(typeof this.board[v][j] === 'number', `i=${v}, j=${j} => ${typeof this.board[v][j]}`);
+      //console.assert(typeof this.board[v][j] === 'number', `i=${v}, j=${j} => ${typeof this.board[v][j]}`);
       if (typeof this.board[v][j] === 'number' && this.board[v][j] > 0) {
         marked[this.board[v][j]]++;
       }
@@ -239,22 +241,40 @@ class Board {
 
   toString()/*: string*/ {
     const k = this.cellsPerSquare * this.squares;
-    let b = '';
-    for (let i = 0; i < k; i++) {
-      for (let j = 0; j < k; j++) {
-        b += `${this.board[i][j] === 0 ? '.' : this.board[i][j]} `;
+    const line = () =>  {
+      let b = '';
+      b += '+';
+      for (let i = 0; i < 29; i++) {
+        b += '-';
       }
-      b += '\n';
+      b += '+';
+      return b;
+    };
+    let b = line() + '\n';
+    for (let i = 0; i < k; i++) {
+      b += '|';
+      if (i > 0 && i % 3 == 0) {
+        b += line() + '\n';
+      }
+      for (let j = 0; j < k; j++) {
+        b += (j > 0 && j % 3 == 0 ? '| ' : ' ');
+        b += this.board[i][j] === 0 ? '.' : this.board[i][j];
+        b += ' ';
+      }
+      b += '|\n';
     }
+    b += line();
     return b;
-    //return inspect(this.board);
   }
 }
 
-const b = Board.create(3, 3);
-console.log(b.toString());
-b.eraseCellsPerSquare(7);
-console.log(b.toString());
+// const b = Board.create(3, 3);
+// console.log(b.toString());
+// b.eraseCellsPerSquare(7);
+// console.log(b.toString());
 
-
-module.exports = Board;
+module.exports = {
+  Board,
+  uniformRand,
+  range
+};
